@@ -87,16 +87,13 @@ const fetchISSFlyOverTimes = function(coords, callback) {
 
     // If request fails i.e. statusCode !== 200
     if (response.statusCode !== 200) {
-      const msg = `Status Code ${response.statusCode} when fetching IP.\nResponse: \n${body}`;
+      const msg = `Status Code ${response.statusCode} when fetching ISS pass times:\n${body}`;
       callback(Error(msg), null);
       return;
     }
 
     // Request has content, parse it
-    const data = JSON.parse(body);
-    // console.log('fromFUnc::: ', data)
-    
-    // Geolocation successful, return coords
+    const data = JSON.parse(body);    
     return callback(null, data.response);
   });
 };
