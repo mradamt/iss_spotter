@@ -27,4 +27,36 @@ const fetchMyIP = function(callback) {
   });
 };
 
-module.exports = { fetchMyIP };
+const fetchCoordsByIP = function(ip, callback) {
+  request(`http://ip-api.com/json/${ip}`, (err, response, body) => {
+    // If request returns an error (invalid domain, api offline etc.)
+    if (err) {
+      return callback(err, null);
+    }
+
+    // If request fails i.e. statusCode !== 200
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
+      callback(Error(msg), null);
+      return;
+    }
+
+    // Request has content, parse it
+    const data = JSON.parse(body);
+
+    // Geolocation fails i.e. content status !== 'success'
+    if (data.status !== 'success') {
+      const errorMsg = `Request status: ${data.status}\nResponse: ${body}`;
+      callback(errorMsg, null);
+      return;
+    }
+    
+    // Geolocation successful, return coords
+    return callback(null, { latitude: data.lat, longitude: data.lon });
+  });
+};
+
+module.exports = {
+  fetchMyIP,
+  fetchCoordsByIP,
+};
