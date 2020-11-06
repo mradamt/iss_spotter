@@ -1,16 +1,30 @@
 const request = require('request');
 
-const fetchMyIP = function(callback) { 
-  request('https://api.ipify.org/?format=json', (err, response, body) => {
-    if (err) {
-      return callback(err, null);
-    };
-    data = JSON.parse(body)
-    console.log(data)
-    return callback(null, data.ip)
+/**
+ * Makes a single API request to retrieve the user's IP address.
+ * Input:
+ *   - A callback (to pass back an error or the IP string)
+ * Returns (via Callback):
+ *   - An error, if any (nullable)
+ *   - The IP address as a string (null if error). Example: "162.245.144.188"
+ */
 
-    // console.log('request returns:::', data, ip); 
-  })
-}
+const fetchMyIP = function(callback) {
+  request('https://api.ipify.org/?format=json', (err, response, body) => {
+    // If request returns an error (invalid domain, api offline etc.)
+    if (err) return callback(err, null);
+
+    // If response is not successful i.e. 200
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
+      callback(Error(msg), null);
+      return;
+    }
+
+    // Request was successful, parse and return body (i.e. IP address)
+    const data = JSON.parse(body);
+    return callback(null, data.ip);
+  });
+};
 
 module.exports = { fetchMyIP };
